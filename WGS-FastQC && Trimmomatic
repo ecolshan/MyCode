@@ -49,6 +49,8 @@ $ java -jar /path/Trimmomatic/trimmomatic-0.36.jar PE -phred33 -trimlog logfile 
 SE模式，HiSeq SE测序：
 $ java -jar /path/Trimmomatic/trimmomatic-0.36.jar SE -phred33 -trimlog se.logfile raw_data/untreated.fq out.untreated.fq.gz ILLUMINACLIP:/path/Trimmomatic/adapters/TruSeq3-SE.fa:2:30:10 SLIDINGWINDOW:5:20 LEADING:5 TRAILING:5 MINLEN:50
 
+另外，【可以加入多线程】
+
 同时需要明确指明质量值体系是Phred33还是Phred64，默认是Phred64，这需要特别注意，因为我们现在的测序数据基本都是Phred33的了。
 剩下的就是输入的fq和输出的fq，可以用-basein和-baseout指定，也可以不用（如上例子），以及被过滤掉的fq要输出到文件。细心的读者可能已经发现这里PE和SE有一个区别：
 在SE模式中，是不需要指定文件来存放被过滤掉的read信息的，后面直接就接Trimmer信息！这是需要注意到的一个地方。
