@@ -1,0 +1,66 @@
+#!/usr/bin/env python
+import os,re,multiprocessing as mp
+def sra_read(sra_table):
+    sra = {}
+    c = 0
+    runs = 0
+    insert_size = 0
+    for i in open(sra_table,'r'):
+        c += 1
+        spl = i.split('\t')
+        if c == 1:
+            for j,jj in enumerate(spl):
+               if jj == 'Run_s':  runs = j
+               if jj == 'InsertSize_l' :  insert_size = j
+        else:
+            sra[ spl[runs] ] = spl[insert_size]
+    return sra
+
+def run_os_cmd(i):
+    os.system(i)
+
+def run_os_cmd_list(in_lst):
+    for i in in_lst:  run_os_cmd(i)
+
+def mpi_func(inputLst,mp_num):
+    lstMpi = []
+    if mp_num == 1:
+        lstMpi = [inputLst,]
+    else:
+        if len(inputLst)%mp_num == 0:  step = len(inputLst) / mp_num
+        else:  step = len(inputLst) / mp_num  + 1
+        for i in range(0,len(inputLst),step):
+            lstMpi.append( inputLst[i:i+step] )
+    jobs = []
+    for i in lstMpi:
+        p = mp.Process(target=run_os_cmd_list, args=(i,))
+        jobs.append(p)
+    for i in jobs:  i.start()
+    for i in jobs:  i.join()
+
+
+def sraDownload(sra_table, sra_loc):
+    sraLst = sra_read(sra_table)
+    for i in sraLst.keys():
+        cmd = "/home/wuq/.aspera/connect/bin/ascp -QT -l 300m -k1 -i /home/wuq/.aspera/connect/etc/asperaweb_id_dsa.openssh "
+        cmd += "anonftp@ftp.ncbi.nlm.nih.gov:/sra/sra-instant/reads/ByRun/sra/SRR/"+i[:6]+"/"+i+'/'+i+'.sra '+ sra_loc
+        print cmd
+        os.system(cmd)
+
+def transformer(sra_table,file_loc,process_number):
+    sraLst = sra_read(sra_table)
+    trans = []
+    mp_num = int(process_number)
+    for i in sraLst.keys():
+         cmd = '/home/wuq/bin/sratoolkit.2.5.4-1-centos_linux64/bin/fastq-dump.2.5.4 --split-spot --split-files  --gzip '
+         cmd += file_loc+'/'+i+ '.sra'
+         trans.append(cmd)
+    print trans
+    mpi_func(trans,mp_num)
+
+
+if __name__ == '__main__':
+
+    if len(os.sys.argv) != 4: exit('Usage: python snpcall0sra.py sra_table fq_location transform_processes_num')
+    sraDownload (os.sys.argv[1],os.sys.argv[2])
+    transformer(os.sys.argv[1],os.sys.argv[2],int(os.sys.argv[3]))
