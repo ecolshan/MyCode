@@ -1,0 +1,10 @@
+#PBS -N select.wuq
+#PBS -q blade
+#PBS -l nodes=1:ppn=1
+#PBS -o /home/wuq/bin/pbsEO/
+#PBS -e /home/wuq/bin/pbsEO/faa_list/
+#PBS -S /bin/bash
+
+echo `date`
+/home/wuq/projects/convergence/bin/main-2.py /home/wuq/projects/convergence/ faa/ bin/ workShop/ /home/software/bin/clustalw2 /home/wuq/projects/convergence/select.txt H0_3-H2_3-H3_3-H5_3- /home/wuq/bin/phylobayes3.3f/data/
+echo `date`
