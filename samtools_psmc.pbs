@@ -1,0 +1,10 @@
+#PBS -N samtools.shan
+#PBS -q blade
+#PBS -l nodes=1:ppn=4,mem=10gb
+#PBS -o /home/wuq/bin/pbsEO/shan_samtools_psmcfile.o
+#PBS -e /home/wuq/bin/pbsEO/shan_samtools_psmcfile.e
+#PBS -S /bin/bash
+
+echo `date`
+/home/wuq/bin/samtools-0.0.18/samtools mpileup -C 50 -uf /home/wuq/shan/psmc/data/chrY.kept.fasta.fai /home/wuq/shan/psmc/result/samtools/smallintestine_50_single.bam.sort.rmdup.bam |/home/wuq/bin/samtools-0.0.18/bcftools view -c -|/home/wuq/bin/samtools-0.0.18/misc/vcfutils.pl vcf2fq -D 100 -d 10 |gzip >/home/wuq/shan/psmc/result/samtools/smallintestine_50_single.fq.gz
+echo `date`

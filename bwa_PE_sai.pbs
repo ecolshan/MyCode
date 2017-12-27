@@ -1,0 +1,14 @@
+#PBS -N bwa.wuq
+#PBS -q blade
+#PBS -l nodes=1:ppn=16,mem=60gb
+#PBS -o /home/wuq/bin/bwaaln1.o
+#PBS -e /home/wuq/bin/bwaaln1.e
+#PBS -S /bin/bash
+
+echo `date`
+/home/wuq/bin/bwa-0.6.2/bwa aln -t 16 /home/wuq/projects/bwa /home/wuq/data/brownPanda/panda_hj/HSZ111338_PIGxaqR/Fastq/PS1_FCC1L7NACXX_L5_SZAIPI021329-33_1.fq >/home/wuq/projects/x-PS1_1.sai
+
+/home/wuq/bin/bwa-0.6.2/bwa aln -t 16 /home/wuq/projects/bwa /home/wuq/data/brownPanda/panda_hj/HSZ111338_PIGxaqR/Fastq/PS1_FCC1L7NACXX_L5_SZAIPI021329-33_2.fq >/home/wuq/projects/x-PS1_2.sai
+
+/home/wuq/bin/bwa-0.6.2/bwa sampe /home/wuq/projects/bwa /home/wuq/projects/x-PS1_1.sai /home/wuq/projects/x-PS1_2.sai /home/wuq/data/brownPanda/panda_hj/HSZ111338_PIGxaqR/Fastq/PS1_FCC1L7NACXX_L5_SZAIPI021329-33_1.fq /home/wuq/data/brownPanda/panda_hj/HSZ111338_PIGxaqR/Fastq/PS1_FCC1L7NACXX_L5_SZAIPI021329-33_2.fq >/home/wuq/projects/x-PS1.sam
+echo `date`

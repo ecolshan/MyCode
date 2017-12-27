@@ -1,0 +1,10 @@
+#PBS -N samtools.shan
+#PBS -q blade
+#PBS -l nodes=1:ppn=4,mem=10gb
+#PBS -o /home/wuq/bin/pbsEO/shan_samtools_sort_rmdup.o
+#PBS -e /home/wuq/bin/pbsEO/shan_samtools_sort_rmdup.e
+#PBS -S /bin/bash
+
+echo `date`
+/home/wuq/bin/samtools-0.0.18/samtools rmdup /home/wuq/shan/psmc/result/samtools/smallintestine_50_single.bam.sort.bam /home/wuq/shan/psmc/result/samtools/smallintestine_50_single.bam.sort.rmdup.bam
+echo `date`

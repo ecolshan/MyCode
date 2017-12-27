@@ -1,0 +1,10 @@
+#PBS -N samtools.shan
+#PBS -q blade
+#PBS -l nodes=1:ppn=4,mem=10gb
+#PBS -o /home/wuq/bin/pbsEO/shan_samtools_bam.o
+#PBS -e /home/wuq/bin/pbsEO/shan_samtools_bam.e
+#PBS -S /bin/bash
+
+echo `date`
+/home/wuq/bin/samtools-0.0.18/samtools view -bt /home/wuq/shan/psmc/data/chrY.kept.fasta.fai -o /home/wuq/shan/psmc/result/samtools/smallintestine_50_single.bam /home/wuq/shan/psmc/result/bwa/smallintestine_50_single.sam
+echo `date`

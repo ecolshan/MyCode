@@ -1,0 +1,10 @@
+#PBS -N psmc.shan
+#PBS -q blade
+#PBS -l nodes=1:ppn=4,mem=10gb
+#PBS -o /home/wuq/bin/pbsEO/shan_psmc.plot.o
+#PBS -e /home/wuq/bin/pbsEO/shan_psmc.plot.e
+#PBS -S /bin/bash
+
+echo `date`
+/nfshome/wuq/bin/psmc-master/utils/psmc_plot.pl -u 1.3e-08 -g 12 /home/wuq/shan/psmc/result/psmc/pandaSonDiploid /home/wuq/shan/psmc/result/psmc/pandaSonDiploid.psmc
+echo `date`

@@ -1,0 +1,14 @@
+#encoding=utf-8
+#PBS -N bwa.shan
+#PBS -q blade
+#PBS -l nodes=1:ppn=4,mem=10gb
+#PBS -o /home/wuq/bin/pbsEO/shan_bwaindex.o
+#PBS -e /home/wuq/bin/pbsEO/shan_bwaindex.e
+#PBS -S /bin/bash
+
+echo `date`
+/home/wuq/bin/bwa-0.6.2/bwa index -p /home/wuq/MS/test/psmc/result/bwa/chY  /home/wuq/MS/test/psmc/data/chrY.kept.fasta
+echo `date`
+
+#缺省参数-a is
+#如果，基因组文件大于2Gb, 则需选用 -a bwtsw

@@ -1,0 +1,10 @@
+#PBS -N bwa.shan
+#PBS -q blade
+#PBS -l nodes=1:ppn=4,mem=10gb
+#PBS -o /home/wuq/bin/pbsEO/shan_bwaaln1.o
+#PBS -e /home/wuq/bin/pbsEO/shan_bwaaln1.e
+#PBS -S /bin/bash
+
+echo `date`
+/home/wuq/bin/bwa-0.6.2/bwa aln -t 4 /home/wuq/shan/psmc/result/bwa/chY /home/wuq/shan/psmc/data/smallintestine_50_single.txt  >/home/wuq/shan/psmc/result/bwa/smallintestine_50_single.sai
+echo `date`
