@@ -1,3 +1,17 @@
+完成了read比对的步骤。接下来是排序：
+排序这一步我们也是通过使用samtools来完成的，命令很简单：
+Usage: samtools sort [options...] [in.bam]
+但在执行之前，我们有必要先搞明白为什么需要排序，为什么BWA比对后输出的BAM文件是没顺序的！
+原因就是FASTQ文件里面这些被测序下来的read是随机分布于基因组上面的，第一步的比对是按照FASTQ文件的顺序把read逐一定位到参考基因组上之后，随即就输出了，它不会也不可能在这一步里面能够自动识别比对位置的先后位置重排比对结果。
+因此，比对后得到的结果文件中，每一条记录之间位置的先后顺序是乱的，我们后续去重复等步骤都需要在比对记录按照顺序从小到大排序下来才能进行，所以这才是需要进行排序的原因。对于我们的例子来说，这个排序的命令如下：
 
+$ time samtools sort -@ 4 -m 4G -O bam -o sample_name.sorted.bam sample_name.bam
+其中，-@，用于设定排序时的线程数，我们设为4；-m，限制排序时最大的内存消耗，这里设为4GB；-O 指定输出为bam格式；-o 是输出文件的名字，这里叫sample_name.sorted.bam。
+我会比较建议大伙在做类似分析的时候在文件名字将所做的关键操作包含进去，因为这样即使过了很长时间，当你再去看这个文件的时候也能够立刻知道当时对它做了什么；最后就是输入文件——sample_name.bam。
+
+
+
+
+[注意] 排序后如果发现新的BAM文件比原来的BAM文件稍微小一些，不用觉得惊讶，这是压缩算法导致的结果，文件内容是没有损失的。
 
 [wuq@localhost-3 ~/shan/reference/alignToRef]$ time /home/wuq/bin/samtools-1.2/samtools sort -@ 4 -m 4G -T sorted -O bam -o ./sorted_bam/KPGP-00001_L1_sorted.bam KPGP-00001_L1.bam
