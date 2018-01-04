@@ -61,15 +61,8 @@ $ bwa mem -t 4 -R '@RG\tID:foo_lane\tPL:illumina\tLB:library\tSM:sample_name' /p
 
 关于BWA的其他参数，我这里不打算对其进行一一解释，在绝大多数情况下，采用默认是合适的做法。
 
-
-[wuq@localhost-3 ~/shan/reference/mydata/cleandata]$/home/wuq/bin/bwa-0.7.12/bwa mem -t 4 -R @RG\tID:KPGP-00001_lane\tPL:illumina\tLB:library\tSM:KPGP-00001_L6 /home/wuq/shan/reference/genome/human_glk_v37/human_g1k_v37.fasta KPGP-00001_L6_R1_clean.fq.gz KPGP-00001_L6_R2_clean.fq.gz  | /home/wuq/bin/samtools-1.2/samtools view -S -b - >/home/wuq/shan/reference/alignToRef/KPGP-00001_L1.bam
-
-
+下面是我在实际比对的命令：
+[wuq@localhost-3 ~/shan/reference/mydata/cleandata]$/home/wuq/bin/bwa-0.7.12/bwa mem -t 4 -R '@RG\tID:KPGP-00001_lane\tPL:illumina\tLB:library\tSM:KPGP-00001_L6' /home/wuq/shan/reference/genome/human_glk_v37/human_g1k_v37.fasta KPGP-00001_L6_R1_clean.fq.gz KPGP-00001_L6_R2_clean.fq.gz  | /home/wuq/bin/samtools-1.2/samtools view -S -b - >/home/wuq/shan/reference/alignToRef/KPGP-00001_L1.bam
 
 
 【Tips]】BWA MEM比对模块是有一定适用范围的：它是专门为长read比对设计的，目的是为了解决，第三代测序技术这种能够产生长达几十kb甚至几Mbp的read情况。一般只有当read长度≥70bp的时候，才推荐使用，如果比这个要小，建议使用BWA ALN模块。
-
-
-
-
-
