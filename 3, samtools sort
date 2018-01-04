@@ -1,0 +1,3 @@
+
+
+[wuq@localhost-3 ~/shan/reference/alignToRef]$ time /home/wuq/bin/samtools-1.2/samtools sort -@ 4 -m 4G -T sorted -O bam -o ./sorted_bam/KPGP-00001_L1_sorted.bam KPGP-00001_L1.bam
