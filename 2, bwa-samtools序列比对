@@ -1,0 +1,75 @@
+序列比对
+先问一个问题：为什么需要比对？
+
+我们已经知道NGS测序下来的短序列（read）存储于FASTQ文件里面。虽然它们原本都来自于有序的基因组，但在经过DNA建库和测序之后，文件中不同read之间的前后顺序关系就已经全部丢失了。
+因此，FASTQ文件中紧挨着的两条read之间没有任何位置关系，它们都是随机来自于原本基因组中某个位置的短序列而已。
+因此，我们需要先把这一大堆的短序列捋顺，一个个去跟该物种的参考基因组*比较，找到每一条read在参考基因组上的位置，然后按顺序排列好，这个过程就称为测序数据的比对。
+这也是核心流程真正意义上的第一步，只有完成了这个序列比对我们才有下一步的数据分析。
+
+以下，我们就开始流程的搭建。
+首先，我们需要为参考基因组的构建索引——这其实是在为参考序列进行Burrows Wheeler变换（wiki: 块排序压缩），以便能够在序列比对的时候进行快速的搜索和定位。
+$ bwa index human.fasta
+以我们人类的参考基因组（3Gb长度）为例，这个构造过程需要消耗几个小时的时间（一般3个小时左右）。完成之后，你会看到类似如下几个以human.fasta为前缀的文件：
+.
+├── human.fasta.amb
+├── human.fasta.ann
+├── human.fasta.bwt
+├── human.fasta.pac
+└── human.fasta.sa
+这些就是在比对时真正需要被用到的文件。这一步完成之后，我们就可以将read比对至参考基因组了：
+
+$ bwa mem -t 4 -R '@RG\tID:foo_lane\tPL:illumina\tLB:library\tSM:sample_name' /path/to/human.fasta read_1.fq.gz read_2.fq.gz > sample_name.sam
+大伙如果以前没使用过这个比对工具的话，那么可能不明白上面参数的含义。我们这里调用的是bwa的mem比对模块，在解释这样做之前，我们不妨先看一下bwa mem的官方用法说明，它就一句话：
+
+Usage: bwa mem [options] <idxbase> <in1.fq> [in2.fq]
+其中，[options] 是一系列可选的参数，暂时不多说。这里的 <idxbase> 要输入的是参考基因组的BW索引文件，我们上面通过bwa index构建好的那几个以human.fasta为前缀的文件便是；<in1.fq>和[in2.fq]输入的是质控后的fastq文件。
+但这里输入的时候为什么会需要两个fq（in1.fq和in2.fq）呢？我们上面的例子也是有两个：read_1.fq.gz和read_2.fq.gz。这是因为这是双末端测序（也称Pair-End）的情况
+
+既然有双末端测序，那么与之对应的就有单末端测序（Single End Sequecing，简称SE测序），即只测序其中一端。因此，我们在使用bwa比对的时候，实际上，in2.fq是非强制性的（所以用方括号括起来），只有是双末端测序的数据时才需要添加。
+
+回到上面我们的例子，大伙可以看到我这里除了用法中提到的参数之外，还多了2个额外的参数，分别是：
+-t，线程数，我们在这里使用4个线程；
+-R 接的是Read Group的字符串信息，这是一个非常重要的信息，以@RG开头，它是用来将比对的read进行分组的。
+不同的组之间测序过程被认为是相互独立的，这个信息对于我们后续对比对数据进行错误率分析和Mark duplicate时非常重要。在Read Group中，有如下几个信息非常重要：
+
+
+
+1）ID，这是Read Group的分组ID，一般设置为测序的lane ID（不同lane之间的测序过程认为是独立的），下机数据中我们都能看到这个信息的，一般都是包含在fastq的文件名中；
+
+2）PL，指的是所用的测序平台，这个信息不要随便写！特别是当我们需要使用GATK进行后续分析的时候，更是如此！
+这是一个很多新手都容易忽视的一个地方，在GATK中，PL只允许被设置为：ILLUMINA,SLX,SOLEXA,SOLID,454,LS454,COMPLETE,PACBIO,IONTORRENT,CAPILLARY,HELICOS或UNKNOWN这几个信息。
+基本上就是目前市场上存在着的测序平台，当然，如果实在不知道，那么必须设置为UNKNOWN，名字方面不区分大小写。如果你在分析的时候这里没设置正确，那么在后续使用GATK过程中可能会碰到类似如下的错误：
+
+ERROR MESSAGE: The platform (xx) associated with read group GATKSAMReadGroupRecord @RG:xx is not a recognized platform.
+这个时候你需要对比对文件的header信息进行重写，就会稍微比较麻烦。
+
+我们上面的例子用的是PL:illumina。如果你的数据是CG测序的那么记得不要写成CG！而要写COMPLETE。
+
+3）SM，样本ID，同样非常重要，有时候我们测序的数据比较多的时候，那么可能会分成多个不同的lane分布测出来，这个时候SM名字就是可以用于区分这些样本；
+
+4）LB，测序文库的名字，这个重要性稍微低一些，主要也是为了协助区分不同的group而存在。文库名字一般可以在下机的fq文件名中找到，如果上面的lane ID足够用于区分的话，也可以不用设置LB。
+
+除了以上这四个之外，还可以自定义添加其他的信息，不过如无特殊的需要，对于序列比对而言，这4个就足够了。这些信息设置好之后，在RG字符串中要用制表符（\t）将它们分开。
+
+
+
+最后在我们的例子中，我们将比对的输出结果直接重定向到一份sample_name.sam文件中，这类文件是BWA比对的标准输出文件，它的具体格式我会在下一篇文章中进行详细说明。
+但SAM文件是文本文件，一般整个文件都非常巨大，因此，为了有效节省磁盘空间，一般都会用samtools将它转化为BAM文件（SAM的特殊二进制格式），而且BAM会更加方便于后续的分析。
+所以我们上面比对的命令可以和samtools结合并改进为：
+$ bwa mem -t 4 -R '@RG\tID:foo_lane\tPL:illumina\tLB:library\tSM:sample_name' /path/to/human.fasta read_1.fq.gz read_2.fq.gz | samtools view -S -b - > sample_name.bam
+我们通过管道(“|”)把比对的输出如同引导水流一样导流给samtools去处理，上面samtools view的-b参数指的就是输出为BAM文件，这里需要注意的地方是-b后面的 '-'，它代表就是上面管道引流过来的数据，经过samtools转换之后我们再重定向为sample_name.bam。
+
+关于BWA的其他参数，我这里不打算对其进行一一解释，在绝大多数情况下，采用默认是合适的做法。
+
+
+[wuq@localhost-3 ~/shan/reference/mydata/cleandata]$/home/wuq/bin/bwa-0.7.12/bwa mem -t 4 -R @RG\tID:KPGP-00001_lane\tPL:illumina\tLB:library\tSM:KPGP-00001_L6 /home/wuq/shan/reference/genome/human_glk_v37/human_g1k_v37.fasta KPGP-00001_L6_R1_clean.fq.gz KPGP-00001_L6_R2_clean.fq.gz  | /home/wuq/bin/samtools-1.2/samtools view -S -b - >/home/wuq/shan/reference/alignToRef/KPGP-00001_L1.bam
+
+
+
+
+【Tips]】BWA MEM比对模块是有一定适用范围的：它是专门为长read比对设计的，目的是为了解决，第三代测序技术这种能够产生长达几十kb甚至几Mbp的read情况。一般只有当read长度≥70bp的时候，才推荐使用，如果比这个要小，建议使用BWA ALN模块。
+
+
+
+
+
