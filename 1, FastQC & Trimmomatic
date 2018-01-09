@@ -73,3 +73,32 @@ MINLEN，规定read被切除后至少需要保留的长度，如果低于该长�
 
 我的Trimmomatic命令：
 [wuq@localhost-3 ~/shan/reference/mydata]$ java -jar /home/wuq/bin/Trimmomatic-0.36/trimmomatic-0.36.jar PE -phred33 -trimlog logfile_L6 KPGP-00001_L6_R1.fq.gz KPGP-00001_L6_R2.fq.gz ./cleandata/KPGP-00001_L6_R1_clean.fq.gz ./cleandata/KPGP-00001_L6_R1_trim.fq.gz ./cleandata/KPGP-00001_L6_R2_clean.fq.gz ./cleandata/KPGP-00001_L6_R2_trim.fq.gz ILLUMINACLIP:/home/wuq/bin/Trimmomatic-0.36/adapters/TruSeq3-PE.fa:2:30:10 SLIDINGWINDOW:5:20 LEADING:5 TRAILING:5 MINLEN:50
+
+
+【Trimmomatic常用命令】
+PE/SE
+    设定对Paired-End或Single-End的reads进行处理，其输入和输出参数稍有不一样。
+-threads
+    设置多线程运行数
+-phred33
+    设置碱基的质量格式，可选pred64
+ILLUMINACLIP:TruSeq3-PE.fa:2:30:10
+    切除adapter序列。参数后面分别接adapter序列的fasta文件：允许的最大mismatch
+数：palindrome模式下匹配碱基数阈值：simple模式下的匹配碱基数阈值。
+LEADING:3
+    切除首端碱基质量小于3的碱基
+TRAILING:3
+    切除尾端碱基质量小于3的碱基
+SLIDINGWINDOW:4:15
+    从5'端开始进行滑动，当滑动位点周围一段序列(window)的平均碱基低于阈值，则从该处进行切除。Windows的size是4个碱基，其平均碱基
+质量小于15，则切除。
+MINLEN:50
+    最小的reads长度
+CROP:<length>
+    保留reads到指定的长度
+HEADCROP:<length>
+    在reads的首端切除指定的长度
+TOPHRED33
+    将碱基质量转换为pred33格式
+TOPHRED64
+    将碱基质量转换为pred64格式
