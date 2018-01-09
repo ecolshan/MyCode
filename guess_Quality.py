@@ -109,7 +109,12 @@ if __name__ == "__main__":
                        doctest.NORMALIZE_WHITESPACE).failed == 0:
         main()
 '''
+我的应用实例：
 [wuq@localhost-3 ~/shan/reference/mydata]$ gunzip -c KPGP-00001_L1_R1.fq.gz | awk 'NR % 4 == 0' | head -n 1000000 | python ./guess_Quality.py
 # reading qualities from STDIN
 Solexa,Illumina-1.3     66      104
+
+[wuq@localhost-3 ~/shan/wgs/polarBear]$ awk 'NR % 4 == 0' SRR933670_1.fastq | head -n 1000000 | python /home/wuq/shan/reference/mydata/guess_Quality.py
+# reading qualities from STDIN
+Sanger,Illumina-1.8     37      67
 '''
