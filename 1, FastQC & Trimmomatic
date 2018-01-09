@@ -83,15 +83,13 @@ PE/SE
 -phred33
     设置碱基的质量格式，可选pred64
 ILLUMINACLIP:TruSeq3-PE.fa:2:30:10
-    切除adapter序列。参数后面分别接adapter序列的fasta文件：允许的最大mismatch
-数：palindrome模式下匹配碱基数阈值：simple模式下的匹配碱基数阈值。
+    切除adapter序列。参数后面分别接adapter序列的fasta文件：允许的最大mismatch数：palindrome模式下匹配碱基数阈值：simple模式下的匹配碱基数阈值。
 LEADING:3
     切除首端碱基质量小于3的碱基
 TRAILING:3
     切除尾端碱基质量小于3的碱基
 SLIDINGWINDOW:4:15
-    从5'端开始进行滑动，当滑动位点周围一段序列(window)的平均碱基低于阈值，则从该处进行切除。Windows的size是4个碱基，其平均碱基
-质量小于15，则切除。
+    从5'端开始进行滑动，当滑动位点周围一段序列(window)的平均碱基低于阈值，则从该处进行切除。Windows的size是4个碱基，其平均碱基质量小于15，则切除。
 MINLEN:50
     最小的reads长度
 CROP:<length>
