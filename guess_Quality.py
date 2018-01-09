@@ -108,3 +108,8 @@ if __name__ == "__main__":
     if doctest.testmod(optionflags=doctest.ELLIPSIS |
                        doctest.NORMALIZE_WHITESPACE).failed == 0:
         main()
+'''
+[wuq@localhost-3 ~/shan/reference/mydata]$ gunzip -c KPGP-00001_L1_R1.fq.gz | awk 'NR % 4 == 0' | head -n 1000000 | python ./guess_Quality.py
+# reading qualities from STDIN
+Solexa,Illumina-1.3     66      104
+'''
